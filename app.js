@@ -26,8 +26,11 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Allows our application to make HTTP requests to Express application
-app.use(cors());
-
+app.use(cors(corsOptions));
+const clientUrl = process.env.CLIENT_URL
+const corsOptions ={
+    origin:clientUrl, 
+}
 // app.use(express.static(path.join(__dirname, 'public')));
 
 /**

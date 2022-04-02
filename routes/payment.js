@@ -1,22 +1,22 @@
-// This example sets up an endpoint using the Express framework.
-// Watch this video to get started: https://youtu.be/rPR2aJ6XnAc.
-const mongoose = require("mongoose");
 const router = require('express').Router();
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+const utils = require('../lib/utils');
+const mongoose = require("mongoose");
 const Product = mongoose.model('Product');
+
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+
 const Redis = require("ioredis");
 const redis = new Redis({
-  port: 18857, // Redis port
-  host: "redis-18857.c83.us-east-1-2.ec2.cloud.redislabs.com", // Redis host
+  port: 13821, // Redis port
+  host: "redis-13821.c80.us-east-1-2.ec2.cloud.redislabs.com", // Redis host
   password: process.env.REDIS_PASSWORD, // Redis password
 })
-// check redis connection
+// check redis connection 
 redis.ping(function (err, result) {
   if(err) console.error(err)
   else console.log("Redis status:",redis.status);
 });
 const DEFAULT_EXPIRATION = 60 * 5
-// redis-18857.c83.us-east-1-2.ec2.cloud.redislabs.com:18857
 
 // router.get('/test',(req,res)=>res.send("Hello world!"))
 router.post('/create-checkout-session', async (req, res) => {
@@ -36,7 +36,6 @@ router.post('/create-checkout-session', async (req, res) => {
         console.log(productInDb);
         item.title = productInDb.name
         item.price = productInDb.priceInCents
-        
       });
       return Promise.all(promises)
     }
@@ -224,8 +223,9 @@ router.get('/session-detail', async(req,res) => {
 // }
 //#endregion
 
-router.get('/purchase-history', (req,res) => {
-  const { customer_id } = req.query
+router.get('/purchase-history/:customer_id/:id', utils.authMiddleware , (req,res) => {
+  const { customer_id, id } = req.params
+  console.log("ID: " + id + " is used for verification");
   try {
     // const promise1 = Promise.resolve(3);
     // const promise2 = 42;
